@@ -22,8 +22,8 @@ class BasicTokenizer(object):
 
     def tokenize(self, text, never_split=None):
         """
-            Basic Tokenization of a piece of text.
-            Split on "white spaces" only, for sub-word tokenization, see WordPieceTokenizer.
+        Basic Tokenization of a piece of text.
+        Split on "white spaces" only, for sub-word tokenization, see WordPieceTokenizer.
         """
         # Additional never_split at tokenization time.
         additional_never_split = never_split if never_split is not None else []
@@ -52,7 +52,8 @@ class WordpieceTokenizer:
         self.max_input_chars_per_word = max_input_chars_per_word
 
     def tokenize(self, text):
-        """Tokenizes a piece of text into its word pieces.
+        """
+        Tokenizes a piece of text into its word pieces.
         This uses a greedy longest-match-first algorithm to perform tokenization
         using the given vocabulary.
         """
