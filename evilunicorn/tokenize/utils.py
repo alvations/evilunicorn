@@ -3,10 +3,21 @@
 #    https://github.com/kimiyoung/transformer-xl/blob/44781ed21dbaec88b280f74d9ae2877f52b492a5/pytorch/mem_transformer.py#L452
 #    https://github.com/google-research/bert/blob/master/tokenization.py
 
+import re
 import regex
 import unicodedata
 
 PUNCT_RE = regex.compile(r'(\p{Punctuation})')
+
+def load_vocab(self, vocab_file, encoding='utf8'):
+    """ Load a vocab file."""
+    vocab = OrderedDict()
+    with open(vocab_file, encoding=encoding) as fin:
+        for index, token in enumerate(fin):
+            token = token.rstrip('\n')
+            vocab[token] = index
+    return vocab
+
 
 def clean_text(text):
     """Performs invalid character removal and whitespace cleanup on text."""
@@ -82,3 +93,28 @@ def whitespace_tokenize(text):
     """Basic whitespace cleaning and splitting on a piece of text."""
     text = text.strip()
     return text.split() if text else []
+
+def lowercase_text(text, all_special_tokens=None):
+    """Convert non-special tokens to lowercase."""
+    if all_special_tokens:
+        escaped_special_toks = r"|".join(
+            [re.escape(s_tok) for s_tok in all_special_tokens]
+        )
+    pattern = fr"({escaped_special_toks})|(.+?)"
+    return re.sub(pattern, lambda m: m.groups()[0] or m.groups()[1].lower(), t)
+
+def clean_up_tokenization(text):
+    """
+    Clean up a list of simple English tokenization artifacts like spaces
+    before punctuations and abreviated forms.
+
+    From https://github.com/huggingface/transformers/blob/master/src/transformers/tokenization_utils.py#L1400
+    """
+    despace_substrings = [".", "?", "!", ",", "'", "n't", "'m", "'s", "'ve", "'re"]
+    for s in despace_substrings:
+        text = text.replace(f" {s}", f"{s}")
+
+    replacements = {"do not":"don't"}
+    for k,v in replacements:
+        text = text.replace(f" {k}", f" {v}")
+    return text
